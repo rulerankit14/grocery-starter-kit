@@ -79,11 +79,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Arman Groceries" },
-      { name: "description", content: "Daily grocery essentials at lowest prices." },
+      { title: "Arman Groceries — Daily Essentials at Lowest Prices" },
+      { name: "description", content: "Shop atta, rice, oil, dry fruits, masalas and household essentials at Arman Groceries. Cash on delivery, 7 days easy return and free delivery on combo packs." },
       { name: "author", content: "Arman Groceries" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Arman Groceries — Daily Essentials at Lowest Prices" },
+      { name: "twitter:title", content: "Arman Groceries — Daily Essentials at Lowest Prices" },
+      { property: "og:description", content: "Shop atta, rice, oil, dry fruits, masalas and household essentials at Arman Groceries. Cash on delivery, 7 days easy return and free delivery on combo packs." },
+      { name: "twitter:description", content: "Shop atta, rice, oil, dry fruits, masalas and household essentials at Arman Groceries. Cash on delivery, 7 days easy return and free delivery on combo packs." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ae534eae6d7ff25e33ce2344bfbe0ded/id-preview-364e7bf6--66de266f-3062-4a81-b212-d94efcb3d153.lovable.app-1786100113541.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/ae534eae6d7ff25e33ce2344bfbe0ded/id-preview-364e7bf6--66de266f-3062-4a81-b212-d94efcb3d153.lovable.app-1786100113541.png" },
     ],
     links: [
       {

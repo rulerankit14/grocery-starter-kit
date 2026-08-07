@@ -20,7 +20,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Grocery combo packs, dry fruits and household essentials with cash on delivery and free shipping.",
+          "Shop atta, rice, oil, dry fruits, masalas and household essentials at Arman Groceries. Cash on delivery, 7 days easy return and free delivery on combo packs.",
       },
     ],
   }),
