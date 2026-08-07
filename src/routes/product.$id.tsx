@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Star, Truck, RotateCcw, BadgeIndianRupee, Zap, ShoppingCart } from "lucide-react";
 import { StoreHeader } from "@/components/store/StoreHeader";
-import { BottomNav } from "@/components/store/BottomNav";
 import { getProduct, discountPercent, products } from "@/lib/products";
 import { ProductCard } from "@/components/store/ProductCard";
+import { useCart } from "@/lib/cart";
+
 
 export const Route = createFileRoute("/product/$id")({
   head: () => ({
@@ -26,7 +27,10 @@ export const Route = createFileRoute("/product/$id")({
 
 function ProductPage() {
   const { id } = Route.useParams();
+  const cart = useCart();
+  const navigate = useNavigate();
   const product = getProduct(id);
+
 
   if (!product) {
     return (
@@ -175,17 +179,26 @@ function ProductPage() {
       <div className="sticky bottom-0 z-40 grid grid-cols-2 gap-3 border-t border-border bg-card px-4 py-3">
         <button
           type="button"
+          onClick={() => {
+            cart.add(product.id);
+            navigate({ to: "/cart" });
+          }}
           className="flex items-center justify-center gap-2 rounded-md border border-primary py-3 text-sm font-bold text-primary"
         >
           <ShoppingCart className="size-4" /> Add to Cart
         </button>
         <button
           type="button"
+          onClick={() => {
+            cart.add(product.id);
+            navigate({ to: "/address" });
+          }}
           className="flex items-center justify-center gap-2 rounded-md bg-primary py-3 text-sm font-bold text-primary-foreground"
         >
           <Zap className="size-4" /> Buy Now
         </button>
       </div>
+
     </div>
   );
 }

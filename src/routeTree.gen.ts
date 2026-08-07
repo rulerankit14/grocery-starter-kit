@@ -10,11 +10,35 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AddressRouteImport } from './routes/address'
+import { Route as CartRouteImport } from './routes/cart'
+import { Route as PaymentRouteImport } from './routes/payment'
+import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AddressRoute = AddressRouteImport.update({
+  id: '/address',
+  path: '/address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CartRoute = CartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentRoute = PaymentRouteImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SummaryRoute = SummaryRouteImport.update({
+  id: '/summary',
+  path: '/summary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductIdRoute = ProductIdRouteImport.update({
@@ -25,27 +49,51 @@ const ProductIdRoute = ProductIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/address': typeof AddressRoute
+  '/cart': typeof CartRoute
+  '/payment': typeof PaymentRoute
+  '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/address': typeof AddressRoute
+  '/cart': typeof CartRoute
+  '/payment': typeof PaymentRoute
+  '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/address': typeof AddressRoute
+  '/cart': typeof CartRoute
+  '/payment': typeof PaymentRoute
+  '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/product/$id'
+  fullPaths:
+    '/' | '/address' | '/cart' | '/payment' | '/summary' | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/product/$id'
-  id: '__root__' | '/' | '/product/$id'
+  to: '/' | '/address' | '/cart' | '/payment' | '/summary' | '/product/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/address'
+    | '/cart'
+    | '/payment'
+    | '/summary'
+    | '/product/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AddressRoute: typeof AddressRoute
+  CartRoute: typeof CartRoute
+  PaymentRoute: typeof PaymentRoute
+  SummaryRoute: typeof SummaryRoute
   ProductIdRoute: typeof ProductIdRoute
 }
 
@@ -56,6 +104,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/address': {
+      id: '/address'
+      path: '/address'
+      fullPath: '/address'
+      preLoaderRoute: typeof AddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cart': {
+      id: '/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment': {
+      id: '/payment'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof PaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/summary': {
+      id: '/summary'
+      path: '/summary'
+      fullPath: '/summary'
+      preLoaderRoute: typeof SummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/$id': {
@@ -70,6 +146,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AddressRoute: AddressRoute,
+  CartRoute: CartRoute,
+  PaymentRoute: PaymentRoute,
+  SummaryRoute: SummaryRoute,
   ProductIdRoute: ProductIdRoute,
 }
 export const routeTree = rootRouteImport

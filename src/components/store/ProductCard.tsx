@@ -1,8 +1,12 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Star } from "lucide-react";
 import { discountPercent, type Product } from "@/lib/products";
+import { useCart } from "@/lib/cart";
 
 export function ProductCard({ product }: { product: Product }) {
+  const cart = useCart();
+  const navigate = useNavigate();
+
   return (
     <article className="flex flex-col overflow-hidden rounded-lg border border-border bg-card">
       <Link
@@ -48,13 +52,16 @@ export function ProductCard({ product }: { product: Product }) {
         {product.freeDelivery && (
           <span className="text-[11px] font-medium text-success">Free Delivery</span>
         )}
-        <Link
-          to="/product/$id"
-          params={{ id: product.id }}
+        <button
+          type="button"
+          onClick={() => {
+            cart.add(product.id);
+            navigate({ to: "/cart" });
+          }}
           className="mt-auto block rounded-md bg-primary py-2 text-center text-xs font-bold text-primary-foreground"
         >
           Add to Cart
-        </Link>
+        </button>
       </div>
     </article>
   );
