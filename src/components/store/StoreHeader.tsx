@@ -1,16 +1,20 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, Menu, Search, ShoppingCart, ChevronLeft } from "lucide-react";
 import { Logo } from "./Logo";
+import { useCart } from "@/lib/cart";
 
 export function StoreHeader({
   back = false,
   showSearch = true,
-  cartCount = 1,
+  cartCount,
 }: {
   back?: boolean;
   showSearch?: boolean;
   cartCount?: number;
 }) {
+  const cart = useCart();
+  const count = cartCount ?? cart.count;
+
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-card">
       <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
@@ -28,12 +32,12 @@ export function StoreHeader({
           <button type="button" aria-label="Wishlist" className="text-destructive">
             <Heart className="size-6 fill-current" />
           </button>
-          <button type="button" aria-label="Cart" className="relative text-primary">
+          <Link to="/cart" aria-label="Cart" className="relative text-primary">
             <ShoppingCart className="size-6" />
             <span className="absolute -right-2 -top-2 grid size-5 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
-              {cartCount}
+              {count}
             </span>
-          </button>
+          </Link>
         </div>
       </div>
       {showSearch && (
