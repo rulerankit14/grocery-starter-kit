@@ -5,15 +5,16 @@ import { StoreHeader } from "@/components/store/StoreHeader";
 import { CheckoutSteps } from "@/components/store/CheckoutSteps";
 import { useCart } from "@/lib/cart";
 
-type SummarySearch = { method?: "upi" | "card" | "cod" };
+type SummarySearch = { method?: "upi" | "card" | "cod" | undefined };
 
 export const Route = createFileRoute("/summary")({
-  validateSearch: (search: Record<string, unknown>): SummarySearch => ({
-    method:
-      search.method === "upi" || search.method === "card" || search.method === "cod"
-        ? search.method
-        : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): SummarySearch => {
+    const raw = search["method"];
+    return {
+      method: raw === "upi" || raw === "card" || raw === "cod" ? raw : undefined,
+    };
+  },
+
   head: () => ({
     meta: [
       { title: "Order Summary — Arman Groceries" },
