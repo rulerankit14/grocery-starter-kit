@@ -100,7 +100,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           qty <= 0 ? prev.filter((l) => l.id !== id) : prev.map((l) => (l.id === id ? { ...l, qty } : l)),
         ),
       remove: (id) => setLines((prev) => prev.filter((l) => l.id !== id)),
-      clear: () => setLines([]),
+      clear: () => setLines((prev) => (prev.length === 0 ? prev : [])),
     };
   }, [lines, delivery, address]);
 

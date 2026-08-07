@@ -59,10 +59,15 @@ function SummaryPage() {
     };
   }
 
-  const clear = cart.clear;
+  const cleared = useRef(false);
+  const cartRef = useRef(cart);
+  cartRef.current = cart;
   useEffect(() => {
-    if (snapshot.current) clear();
-  }, [clear]);
+    if (cleared.current) return;
+    cleared.current = true;
+    cartRef.current.clear();
+  }, []);
+
 
   const order = snapshot.current;
 
