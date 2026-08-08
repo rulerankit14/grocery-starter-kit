@@ -6,6 +6,7 @@ export type StaffMember = {
   email: string;
   fullName: string | null;
   role: "owner" | "admin";
+  loginCode: string;
 };
 
 /** Claims ownership of the store for the signed-in user when no owner exists yet. */
@@ -51,7 +52,7 @@ export const listStaff = createServerFn({ method: "POST" })
     const supabaseAdmin = await assertOwner(context.userId);
     const { data: roles, error } = await supabaseAdmin
       .from("user_roles")
-      .select("user_id, role")
+      .select("user_id, role, login_code")
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
 
@@ -69,6 +70,7 @@ export const listStaff = createServerFn({ method: "POST" })
         email: (profile?.email as string) ?? "—",
         fullName: (profile?.full_name as string | null) ?? null,
         role: r.role as "owner" | "admin",
+        loginCode: (r.login_code as string) ?? "",
       };
     });
   });
