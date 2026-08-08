@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { RotateCcw, Truck, BadgeIndianRupee, Zap } from "lucide-react";
 import { StoreHeader } from "@/components/store/StoreHeader";
 import { BottomNav } from "@/components/store/BottomNav";
 import { ProductCard } from "@/components/store/ProductCard";
-import { products } from "@/lib/products";
-import banner from "@/assets/banner-grains.jpg";
+import { productsQuery, bannersQuery } from "@/lib/products";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -22,6 +22,8 @@ export const Route = createFileRoute("/")({
         content:
           "Shop atta, rice, oil, dry fruits, masalas and household essentials at Arman Groceries. Cash on delivery, 7 days easy return and free delivery on combo packs.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Index,
@@ -41,7 +43,9 @@ function useCountdown(seconds: number) {
 
 function Index() {
   const timer = useCountdown(60 * 47 + 12);
-  const grid = [...products, ...products];
+  const { data: products = [], isLoading } = useQuery(productsQuery());
+  const { data: banners = [] } = useQuery(bannersQuery());
+  const banner = banners[0];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -58,23 +62,27 @@ function Index() {
           </div>
         </div>
 
-        <section className="relative bg-card">
-          <img
-            src={banner}
-            alt="Foodgrains, oils and ghee sale banner"
-            width={1200}
-            height={600}
-            className="h-44 w-full object-cover sm:h-56"
-          />
-          <div className="absolute inset-y-0 left-0 flex w-1/2 flex-col justify-center gap-2 px-4">
-            <h2 className="font-display text-lg font-extrabold leading-tight sm:text-2xl">
-              Foodgrains, Oils &amp; Ghee
-            </h2>
-            <span className="w-fit rounded bg-success px-2 py-1 text-xs font-bold text-success-foreground sm:text-sm">
-              UP TO 60% OFF
-            </span>
-          </div>
-        </section>
+        {banner && (
+          <section className="relative bg-card">
+            <img
+              src={banner.imageUrl}
+              alt={banner.title || "Sale banner"}
+              width={1200}
+              height={600}
+              className="h-44 w-full object-cover sm:h-56"
+            />
+            <div className="absolute inset-y-0 left-0 flex w-1/2 flex-col justify-center gap-2 px-4">
+              <h2 className="font-display text-lg font-extrabold leading-tight sm:text-2xl">
+                {banner.title}
+              </h2>
+              {banner.badge && (
+                <span className="w-fit rounded bg-success px-2 py-1 text-xs font-bold text-success-foreground sm:text-sm">
+                  {banner.badge}
+                </span>
+              )}
+            </div>
+          </section>
+        )}
 
         <div className="overflow-hidden bg-secondary py-1.5">
           <div className="marquee-track text-xs font-bold text-secondary-foreground">
@@ -106,11 +114,19 @@ function Index() {
 
         <section className="px-3 pb-6 pt-4">
           <h2 className="mb-3 font-display text-lg font-extrabold">Products For You</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {grid.map((p, i) => (
-              <ProductCard key={`${p.id}-${i}`} product={p} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="grid grid-cols-2 gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-64 animate-pulse rounded-lg bg-muted" />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {products.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
         </section>
 
         <footer className="bg-card px-4 py-8 text-center">

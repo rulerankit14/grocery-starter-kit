@@ -4,6 +4,8 @@ import { ShieldCheck, Banknote, Smartphone, CreditCard } from "lucide-react";
 import { StoreHeader } from "@/components/store/StoreHeader";
 import { CheckoutSteps } from "@/components/store/CheckoutSteps";
 import { useCart } from "@/lib/cart";
+import { useQuery } from "@tanstack/react-query";
+import { settingsQuery } from "@/lib/products";
 
 export const Route = createFileRoute("/payment")({
   head: () => ({
@@ -29,6 +31,7 @@ function PaymentPage() {
   const cart = useCart();
   const navigate = useNavigate();
   const [method, setMethod] = useState<Method>("upi");
+  const { data: settings } = useQuery(settingsQuery());
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -93,6 +96,7 @@ function PaymentPage() {
         </section>
 
         <p className="px-4 py-4 text-center text-[11px] text-muted-foreground">
+          {method === "upi" && settings?.upiId ? `Pay to UPI ID ${settings.upiId} (${settings.upiName}). ` : ""}
           Online payment is not connected yet. Placing an order here creates a demo order summary.
         </p>
       </main>
