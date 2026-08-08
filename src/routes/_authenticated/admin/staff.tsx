@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Trash2 } from "lucide-react";
+import { Copy, Trash2 } from "lucide-react";
 import { AdminShell, useIsOwner } from "@/components/admin/AdminShell";
 import { addAdmin, listStaff, removeAdmin } from "@/lib/admin.functions";
 
@@ -33,6 +33,7 @@ function AdminStaff() {
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState("");
 
   const create = useMutation({
     mutationFn: () => addAdmin({ data: { email, password, fullName } }),
@@ -103,6 +104,19 @@ function AdminStaff() {
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">{m.fullName || m.email}</p>
               <p className="truncate text-xs text-muted-foreground">{m.email}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  const link = `${window.location.origin}/${m.loginCode}`;
+                  navigator.clipboard?.writeText(link);
+                  setCopied(m.userId);
+                  setTimeout(() => setCopied(""), 1500);
+                }}
+                className="mt-1 flex items-center gap-1 text-[11px] font-semibold text-primary"
+              >
+                <Copy className="size-3" />
+                {copied === m.userId ? "Link copied!" : `/${m.loginCode}`}
+              </button>
             </div>
             <span className="rounded bg-accent px-2 py-0.5 text-[11px] font-bold uppercase text-accent-foreground">
               {m.role}

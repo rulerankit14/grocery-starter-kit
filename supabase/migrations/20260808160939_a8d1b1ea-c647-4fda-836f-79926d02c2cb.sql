@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.login_code_valid(text);

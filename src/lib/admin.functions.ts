@@ -6,6 +6,7 @@ export type StaffMember = {
   email: string;
   fullName: string | null;
   role: "owner" | "admin";
+  loginCode: string;
 };
 
 /** Claims ownership of the store for the signed-in user when no owner exists yet. */
@@ -51,7 +52,7 @@ export const listStaff = createServerFn({ method: "POST" })
     const supabaseAdmin = await assertOwner(context.userId);
     const { data: roles, error } = await supabaseAdmin
       .from("user_roles")
-      .select("user_id, role")
+      .select("user_id, role, login_code")
       .order("created_at", { ascending: true });
     if (error) throw new Error(error.message);
 
@@ -69,6 +70,7 @@ export const listStaff = createServerFn({ method: "POST" })
         email: (profile?.email as string) ?? "—",
         fullName: (profile?.full_name as string | null) ?? null,
         role: r.role as "owner" | "admin",
+        loginCode: (r.login_code as string) ?? "",
       };
     });
   });
@@ -123,4 +125,18 @@ export const removeAdmin = createServerFn({ method: "POST" })
     await supabaseAdmin.from("profiles").delete().eq("id", data.userId);
     await supabaseAdmin.auth.admin.deleteUser(data.userId);
     return { ok: true };
+  });
+
+/** Confirms the secret link code in the URL belongs to the signed-in staff member. */
+export const verifyLoginCode = createServerFn({ method: "POST" })
+  .inputValidator((input: { code: string }) => ({ code: input.code.trim().toLowerCase().slice(0, 24) }))
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: boolean }> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("user_roles")
+      .select("login_code")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    return { ok: !!row && (row.login_code as string) === data.code };
   });
