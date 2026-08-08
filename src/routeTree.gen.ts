@@ -15,6 +15,7 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as ApiPublicImgSplatRouteImport } from './routes/api/public/img/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
+  id: '/api/public/img/$',
+  path: '/api/public/img/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/payment': typeof PaymentRoute
   '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
+  '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/payment': typeof PaymentRoute
   '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
+  '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,13 +79,27 @@ export interface FileRoutesById {
   '/payment': typeof PaymentRoute
   '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
+  '/api/public/img/$': typeof ApiPublicImgSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/address' | '/cart' | '/payment' | '/summary' | '/product/$id'
+    | '/'
+    | '/address'
+    | '/cart'
+    | '/payment'
+    | '/summary'
+    | '/product/$id'
+    | '/api/public/img/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/address' | '/cart' | '/payment' | '/summary' | '/product/$id'
+  to:
+    | '/'
+    | '/address'
+    | '/cart'
+    | '/payment'
+    | '/summary'
+    | '/product/$id'
+    | '/api/public/img/$'
   id:
     | '__root__'
     | '/'
@@ -86,6 +108,7 @@ export interface FileRouteTypes {
     | '/payment'
     | '/summary'
     | '/product/$id'
+    | '/api/public/img/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +118,7 @@ export interface RootRouteChildren {
   PaymentRoute: typeof PaymentRoute
   SummaryRoute: typeof SummaryRoute
   ProductIdRoute: typeof ProductIdRoute
+  ApiPublicImgSplatRoute: typeof ApiPublicImgSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/img/$': {
+      id: '/api/public/img/$'
+      path: '/api/public/img/$'
+      fullPath: '/api/public/img/$'
+      preLoaderRoute: typeof ApiPublicImgSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -151,17 +182,8 @@ const rootRouteChildren: RootRouteChildren = {
   PaymentRoute: PaymentRoute,
   SummaryRoute: SummaryRoute,
   ProductIdRoute: ProductIdRoute,
+  ApiPublicImgSplatRoute: ApiPublicImgSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
