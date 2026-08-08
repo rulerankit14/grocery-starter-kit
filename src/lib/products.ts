@@ -191,7 +191,7 @@ export async function uploadStoreImage(file: File, folder: string): Promise<stri
   const { error } = await supabase.storage.from("store").upload(path, file, {
     cacheControl: "31536000",
     upsert: false,
-    contentType: file.type || undefined,
+    contentType: file.type || "image/jpeg",
   });
   if (error) throw error;
   return `/api/public/img/${path}`;
