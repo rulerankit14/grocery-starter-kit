@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Star, Truck, RotateCcw, BadgeIndianRupee, Zap, ShoppingCart } from "lucide-react";
 import { StoreHeader } from "@/components/store/StoreHeader";
-import { getProduct, discountPercent, products } from "@/lib/products";
+import { discountPercent, productQuery, productsQuery, reviewsQuery } from "@/lib/products";
 import { ProductCard } from "@/components/store/ProductCard";
 import { useCart } from "@/lib/cart";
-
 
 export const Route = createFileRoute("/product/$id")({
   head: () => ({
@@ -20,6 +20,8 @@ export const Route = createFileRoute("/product/$id")({
         property: "og:description",
         content: "Grocery combo packs with real customer ratings and reviews.",
       },
+      { property: "og:type", content: "product" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ProductPage,
@@ -29,8 +31,18 @@ function ProductPage() {
   const { id } = Route.useParams();
   const cart = useCart();
   const navigate = useNavigate();
-  const product = getProduct(id);
+  const { data: product, isLoading } = useQuery(productQuery(id));
+  const { data: reviews = [] } = useQuery(reviewsQuery(id));
+  const { data: all = [] } = useQuery(productsQuery());
 
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <StoreHeader back showSearch={false} />
+        <div className="aspect-square w-full animate-pulse bg-muted" />
+      </div>
+    );
+  }
 
   if (!product) {
     return (
@@ -47,16 +59,11 @@ function ProductPage() {
   }
 
   const off = discountPercent(product.price, product.mrp);
-  const related = products.filter((p) => p.id !== product.id).slice(0, 4);
-  const buckets = [5, 4, 3, 2, 1].map((s) => ({
-    stars: s,
-    count: product.reviews.filter((r) => r.stars === s).length,
-  }));
-  const maxBucket = Math.max(1, ...buckets.map((b) => b.count));
+  const related = all.filter((p) => p.id !== product.id).slice(0, 4);
 
   return (
     <div className="flex min-h-screen flex-col">
-      <StoreHeader back showSearch={false} cartCount={1} />
+      <StoreHeader back showSearch={false} />
 
       <main className="mx-auto w-full max-w-3xl flex-1 pb-24">
         <div className="bg-card">
@@ -67,7 +74,7 @@ function ProductPage() {
             height={800}
             className="aspect-square w-full object-cover"
           />
-          <p className="px-4 pt-2 text-xs text-muted-foreground">1 / 4 · Arman Groceries</p>
+          <p className="px-4 pt-2 text-xs text-muted-foreground">Arman Groceries</p>
         </div>
 
         <section className="mt-2 bg-card px-4 py-4">
@@ -98,82 +105,61 @@ function ProductPage() {
         <section className="mt-2 bg-card px-4 py-4">
           <h2 className="font-display text-base font-bold">Product Description</h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{product.description}</p>
-          <h3 className="mt-4 text-sm font-bold">Key Features</h3>
-          <ul className="mt-2 space-y-1.5">
-            {product.highlights.map((h) => (
-              <li key={h} className="flex gap-2 text-sm text-muted-foreground">
-                <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
-                {h}
-              </li>
-            ))}
-          </ul>
+          {product.highlights.length > 0 && (
+            <>
+              <h3 className="mt-4 text-sm font-bold">Key Features</h3>
+              <ul className="mt-2 space-y-1.5">
+                {product.highlights.map((h) => (
+                  <li key={h} className="flex gap-2 text-sm text-muted-foreground">
+                    <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                    {h}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </section>
 
-        <section className="mt-2 bg-card px-4 py-4">
-          <h2 className="font-display text-base font-bold">Ratings &amp; Reviews</h2>
-          <div className="mt-3 flex gap-5">
-            <div className="text-center">
-              <div className="flex items-center gap-1 font-display text-3xl font-extrabold">
+        {reviews.length > 0 && (
+          <section className="mt-2 bg-card px-4 py-4">
+            <h2 className="font-display text-base font-bold">Ratings &amp; Reviews</h2>
+            <div className="mt-3 flex items-center gap-3">
+              <span className="flex items-center gap-1 font-display text-3xl font-extrabold">
                 {product.rating}
                 <Star className="size-5 fill-success text-success" />
-              </div>
-              <p className="mt-1 text-[11px] text-muted-foreground">
+              </span>
+              <p className="text-[11px] text-muted-foreground">
                 {product.ratingCount.toLocaleString("en-IN")} Ratings
               </p>
             </div>
-            <div className="flex-1 space-y-1">
-              {buckets.map((b) => (
-                <div key={b.stars} className="flex items-center gap-2">
-                  <span className="w-3 text-[11px] text-muted-foreground">{b.stars}</span>
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-success"
-                      style={{ width: `${(b.count / maxBucket) * 100}%` }}
-                    />
-                  </div>
-                </div>
+            <ul className="mt-4 space-y-4">
+              {reviews.map((r) => (
+                <li key={r.id} className="overflow-hidden rounded-lg border border-border">
+                  <img
+                    src={r.imageUrl}
+                    alt={r.caption || "Customer review"}
+                    loading="lazy"
+                    className="w-full object-contain"
+                  />
+                  {r.caption && (
+                    <p className="px-3 py-2 text-xs text-muted-foreground">{r.caption}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {related.length > 0 && (
+          <section className="mt-2 bg-card px-4 py-4">
+            <h2 className="font-display text-base font-bold">Similar Products</h2>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              {related.map((p) => (
+                <ProductCard key={p.id} product={p} />
               ))}
             </div>
-          </div>
-
-          <ul className="mt-4 divide-y divide-border">
-            {product.reviews.map((r) => (
-              <li key={r.name} className="py-4">
-                <div className="flex items-center gap-2">
-                  <span className="grid size-8 place-items-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
-                    {r.initials}
-                  </span>
-                  <div>
-                    <p className="text-sm font-semibold">{r.name}</p>
-                    <p className="text-[11px] text-muted-foreground">Verified Purchase</p>
-                  </div>
-                  <span className="ml-auto text-[11px] text-muted-foreground">{r.date}</span>
-                </div>
-                <div className="mt-2 flex items-center gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`size-3.5 ${
-                        i < r.stars ? "fill-deal text-deal" : "text-muted-foreground/40"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{r.text}</p>
-                <p className="mt-2 text-[11px] text-muted-foreground">Helpful · {r.likes}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="mt-2 bg-card px-4 py-4">
-          <h2 className="font-display text-base font-bold">Similar Products</h2>
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </section>
+          </section>
+        )}
       </main>
 
       <div className="sticky bottom-0 z-40 grid grid-cols-2 gap-3 border-t border-border bg-card px-4 py-3">
@@ -198,7 +184,6 @@ function ProductPage() {
           <Zap className="size-4" /> Buy Now
         </button>
       </div>
-
     </div>
   );
 }
