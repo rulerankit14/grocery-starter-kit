@@ -176,18 +176,21 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          login_code: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
+          login_code?: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
+          login_code?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
@@ -198,6 +201,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      gen_login_code: { Args: never; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -206,6 +210,7 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      login_code_valid: { Args: { _code: string }; Returns: boolean }
     }
     Enums: {
       app_role: "owner" | "admin"
