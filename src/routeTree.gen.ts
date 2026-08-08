@@ -12,9 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AddressRouteImport } from './routes/address'
-import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as PaymentRouteImport } from './routes/payment'
+import { Route as Staff9f2kRouteImport } from './routes/staff-9f2k'
 import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
@@ -39,11 +39,6 @@ const AddressRoute = AddressRouteImport.update({
   path: '/address',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
@@ -52,6 +47,11 @@ const CartRoute = CartRouteImport.update({
 const PaymentRoute = PaymentRouteImport.update({
   id: '/payment',
   path: '/payment',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Staff9f2kRoute = Staff9f2kRouteImport.update({
+  id: '/staff-9f2k',
+  path: '/staff-9f2k',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SummaryRoute = SummaryRouteImport.update({
@@ -106,9 +106,9 @@ const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/address': typeof AddressRoute
-  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/payment': typeof PaymentRoute
+  '/staff-9f2k': typeof Staff9f2kRoute
   '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/banners': typeof AuthenticatedAdminBannersRoute
@@ -122,9 +122,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/address': typeof AddressRoute
-  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/payment': typeof PaymentRoute
+  '/staff-9f2k': typeof Staff9f2kRoute
   '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/banners': typeof AuthenticatedAdminBannersRoute
@@ -140,9 +140,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/address': typeof AddressRoute
-  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/payment': typeof PaymentRoute
+  '/staff-9f2k': typeof Staff9f2kRoute
   '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
   '/_authenticated/admin/banners': typeof AuthenticatedAdminBannersRoute
@@ -158,9 +158,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/address'
-    | '/auth'
     | '/cart'
     | '/payment'
+    | '/staff-9f2k'
     | '/summary'
     | '/product/$id'
     | '/admin/banners'
@@ -174,9 +174,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/address'
-    | '/auth'
     | '/cart'
     | '/payment'
+    | '/staff-9f2k'
     | '/summary'
     | '/product/$id'
     | '/admin/banners'
@@ -191,9 +191,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/address'
-    | '/auth'
     | '/cart'
     | '/payment'
+    | '/staff-9f2k'
     | '/summary'
     | '/product/$id'
     | '/_authenticated/admin/banners'
@@ -209,9 +209,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AddressRoute: typeof AddressRoute
-  AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   PaymentRoute: typeof PaymentRoute
+  Staff9f2kRoute: typeof Staff9f2kRoute
   SummaryRoute: typeof SummaryRoute
   ProductIdRoute: typeof ProductIdRoute
   ApiPublicImgSplatRoute: typeof ApiPublicImgSplatRoute
@@ -240,13 +240,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AddressRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/cart': {
       id: '/cart'
       path: '/cart'
@@ -259,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/payment'
       fullPath: '/payment'
       preLoaderRoute: typeof PaymentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staff-9f2k': {
+      id: '/staff-9f2k'
+      path: '/staff-9f2k'
+      fullPath: '/staff-9f2k'
+      preLoaderRoute: typeof Staff9f2kRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/summary': {
@@ -352,9 +352,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AddressRoute: AddressRoute,
-  AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   PaymentRoute: PaymentRoute,
+  Staff9f2kRoute: Staff9f2kRoute,
   SummaryRoute: SummaryRoute,
   ProductIdRoute: ProductIdRoute,
   ApiPublicImgSplatRoute: ApiPublicImgSplatRoute,

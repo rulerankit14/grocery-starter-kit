@@ -12,3 +12,7 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+User-agent: *
+Disallow: /staff-9f2k
+Disallow: /admin
