@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/store/Logo";
 import { claimOwnership } from "@/lib/admin.functions";
 
-export const Route = createFileRoute("/auth")({
+export const Route = createFileRoute("/staff-9f2k")({
   head: () => ({
     meta: [
       { title: "Staff Sign In — Arman Groceries" },
@@ -46,7 +46,7 @@ function AuthPage() {
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: email.trim(),
           password,
-          options: { emailRedirectTo: window.location.origin + "/auth" },
+          options: { emailRedirectTo: window.location.origin + "/staff-9f2k" },
         });
         if (signUpError) throw signUpError;
         if (!data.session) {
