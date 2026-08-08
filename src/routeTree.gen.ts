@@ -19,6 +19,7 @@ import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminBannersRouteImport } from './routes/_authenticated/admin/banners'
+import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authenticated/admin/staff'
 import { Route as AuthenticatedAdminUpiRouteImport } from './routes/_authenticated/admin/upi'
 import { Route as AuthenticatedAdminProductsIndexRouteImport } from './routes/_authenticated/admin/products/index'
 import { Route as AuthenticatedAdminProductsIdRouteImport } from './routes/_authenticated/admin/products/$id'
@@ -74,6 +75,11 @@ const AuthenticatedAdminBannersRoute =
     path: '/admin/banners',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminStaffRoute = AuthenticatedAdminStaffRouteImport.update({
+  id: '/admin/staff',
+  path: '/admin/staff',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAdminUpiRoute = AuthenticatedAdminUpiRouteImport.update({
   id: '/admin/upi',
   path: '/admin/upi',
@@ -106,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/banners': typeof AuthenticatedAdminBannersRoute
+  '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/upi': typeof AuthenticatedAdminUpiRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/admin/products/$id': typeof AuthenticatedAdminProductsIdRoute
@@ -121,6 +128,7 @@ export interface FileRoutesByTo {
   '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/banners': typeof AuthenticatedAdminBannersRoute
+  '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/upi': typeof AuthenticatedAdminUpiRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/admin/products/$id': typeof AuthenticatedAdminProductsIdRoute
@@ -138,6 +146,7 @@ export interface FileRoutesById {
   '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
   '/_authenticated/admin/banners': typeof AuthenticatedAdminBannersRoute
+  '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/_authenticated/admin/upi': typeof AuthenticatedAdminUpiRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/admin/products/$id': typeof AuthenticatedAdminProductsIdRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/summary'
     | '/product/$id'
     | '/admin/banners'
+    | '/admin/staff'
     | '/admin/upi'
     | '/admin/'
     | '/admin/products/$id'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/summary'
     | '/product/$id'
     | '/admin/banners'
+    | '/admin/staff'
     | '/admin/upi'
     | '/admin'
     | '/admin/products/$id'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/summary'
     | '/product/$id'
     | '/_authenticated/admin/banners'
+    | '/_authenticated/admin/staff'
     | '/_authenticated/admin/upi'
     | '/_authenticated/admin/'
     | '/_authenticated/admin/products/$id'
@@ -277,6 +289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminBannersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/staff': {
+      id: '/_authenticated/admin/staff'
+      path: '/admin/staff'
+      fullPath: '/admin/staff'
+      preLoaderRoute: typeof AuthenticatedAdminStaffRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/upi': {
       id: '/_authenticated/admin/upi'
       path: '/admin/upi'
@@ -310,6 +329,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminBannersRoute: typeof AuthenticatedAdminBannersRoute
+  AuthenticatedAdminStaffRoute: typeof AuthenticatedAdminStaffRoute
   AuthenticatedAdminUpiRoute: typeof AuthenticatedAdminUpiRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminProductsIdRoute: typeof AuthenticatedAdminProductsIdRoute
@@ -318,6 +338,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminBannersRoute: AuthenticatedAdminBannersRoute,
+  AuthenticatedAdminStaffRoute: AuthenticatedAdminStaffRoute,
   AuthenticatedAdminUpiRoute: AuthenticatedAdminUpiRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminProductsIdRoute: AuthenticatedAdminProductsIdRoute,
