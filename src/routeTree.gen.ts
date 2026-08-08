@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AddressRouteImport } from './routes/address'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as SummaryRouteImport } from './routes/summary'
@@ -25,6 +26,11 @@ const IndexRoute = IndexRouteImport.update({
 const AddressRoute = AddressRouteImport.update({
   id: '/address',
   path: '/address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CartRoute = CartRouteImport.update({
@@ -56,6 +62,7 @@ const ApiPublicImgSplatRoute = ApiPublicImgSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/address': typeof AddressRoute
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/payment': typeof PaymentRoute
   '/summary': typeof SummaryRoute
@@ -65,6 +72,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/address': typeof AddressRoute
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/payment': typeof PaymentRoute
   '/summary': typeof SummaryRoute
@@ -75,6 +83,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/address': typeof AddressRoute
+  '/auth': typeof AuthRoute
   '/cart': typeof CartRoute
   '/payment': typeof PaymentRoute
   '/summary': typeof SummaryRoute
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/address'
+    | '/auth'
     | '/cart'
     | '/payment'
     | '/summary'
@@ -95,6 +105,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/address'
+    | '/auth'
     | '/cart'
     | '/payment'
     | '/summary'
@@ -104,6 +115,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/address'
+    | '/auth'
     | '/cart'
     | '/payment'
     | '/summary'
@@ -114,6 +126,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AddressRoute: typeof AddressRoute
+  AuthRoute: typeof AuthRoute
   CartRoute: typeof CartRoute
   PaymentRoute: typeof PaymentRoute
   SummaryRoute: typeof SummaryRoute
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/address'
       fullPath: '/address'
       preLoaderRoute: typeof AddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cart': {
@@ -178,6 +198,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AddressRoute: AddressRoute,
+  AuthRoute: AuthRoute,
   CartRoute: CartRoute,
   PaymentRoute: PaymentRoute,
   SummaryRoute: SummaryRoute,
