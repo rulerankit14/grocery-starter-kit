@@ -124,3 +124,17 @@ export const removeAdmin = createServerFn({ method: "POST" })
     await supabaseAdmin.auth.admin.deleteUser(data.userId);
     return { ok: true };
   });
+
+/** Confirms the secret link code in the URL belongs to the signed-in staff member. */
+export const verifyLoginCode = createServerFn({ method: "POST" })
+  .inputValidator((input: { code: string }) => ({ code: input.code.trim().toLowerCase().slice(0, 24) }))
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ ok: boolean }> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("user_roles")
+      .select("login_code")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    return { ok: !!row && (row.login_code as string) === data.code };
+  });
