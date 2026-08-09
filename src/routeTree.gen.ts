@@ -16,7 +16,6 @@ import { Route as AddressRouteImport } from './routes/address'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as PaymentRouteImport } from './routes/payment'
 import { Route as Staff9f2kRouteImport } from './routes/staff-9f2k'
-import { Route as SummaryRouteImport } from './routes/summary'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as AuthenticatedAdminBannersRouteImport } from './routes/_authenticated/admin/banners'
@@ -58,11 +57,6 @@ const PaymentRoute = PaymentRouteImport.update({
 const Staff9f2kRoute = Staff9f2kRouteImport.update({
   id: '/staff-9f2k',
   path: '/staff-9f2k',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SummaryRoute = SummaryRouteImport.update({
-  id: '/summary',
-  path: '/summary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProductIdRoute = ProductIdRouteImport.update({
@@ -116,7 +110,6 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/payment': typeof PaymentRoute
   '/staff-9f2k': typeof Staff9f2kRoute
-  '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/banners': typeof AuthenticatedAdminBannersRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
@@ -133,7 +126,6 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/payment': typeof PaymentRoute
   '/staff-9f2k': typeof Staff9f2kRoute
-  '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
   '/admin/banners': typeof AuthenticatedAdminBannersRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
@@ -152,7 +144,6 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/payment': typeof PaymentRoute
   '/staff-9f2k': typeof Staff9f2kRoute
-  '/summary': typeof SummaryRoute
   '/product/$id': typeof ProductIdRoute
   '/_authenticated/admin/banners': typeof AuthenticatedAdminBannersRoute
   '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
@@ -171,7 +162,6 @@ export interface FileRouteTypes {
     | '/cart'
     | '/payment'
     | '/staff-9f2k'
-    | '/summary'
     | '/product/$id'
     | '/admin/banners'
     | '/admin/staff'
@@ -188,7 +178,6 @@ export interface FileRouteTypes {
     | '/cart'
     | '/payment'
     | '/staff-9f2k'
-    | '/summary'
     | '/product/$id'
     | '/admin/banners'
     | '/admin/staff'
@@ -206,7 +195,6 @@ export interface FileRouteTypes {
     | '/cart'
     | '/payment'
     | '/staff-9f2k'
-    | '/summary'
     | '/product/$id'
     | '/_authenticated/admin/banners'
     | '/_authenticated/admin/staff'
@@ -225,7 +213,6 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   PaymentRoute: typeof PaymentRoute
   Staff9f2kRoute: typeof Staff9f2kRoute
-  SummaryRoute: typeof SummaryRoute
   ProductIdRoute: typeof ProductIdRoute
   ApiPublicImgSplatRoute: typeof ApiPublicImgSplatRoute
 }
@@ -279,13 +266,6 @@ declare module '@tanstack/react-router' {
       path: '/staff-9f2k'
       fullPath: '/staff-9f2k'
       preLoaderRoute: typeof Staff9f2kRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/summary': {
-      id: '/summary'
-      path: '/summary'
-      fullPath: '/summary'
-      preLoaderRoute: typeof SummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/product/$id': {
@@ -376,20 +356,9 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   PaymentRoute: PaymentRoute,
   Staff9f2kRoute: Staff9f2kRoute,
-  SummaryRoute: SummaryRoute,
   ProductIdRoute: ProductIdRoute,
   ApiPublicImgSplatRoute: ApiPublicImgSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
