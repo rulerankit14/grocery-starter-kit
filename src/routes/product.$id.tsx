@@ -2,8 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Star, Truck, RotateCcw, BadgeIndianRupee, Zap, ShoppingCart } from "lucide-react";
 import { StoreHeader } from "@/components/store/StoreHeader";
-import { discountPercent, productQuery, productsQuery, reviewsQuery } from "@/lib/products";
+import { discountPercent, productImagesQuery, productQuery, productsQuery, reviewsQuery } from "@/lib/products";
 import { ProductCard } from "@/components/store/ProductCard";
+import { ImageCarousel } from "@/components/store/ImageCarousel";
 import { useCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/product/$id")({
@@ -33,6 +34,7 @@ function ProductPage() {
   const navigate = useNavigate();
   const { data: product, isLoading } = useQuery(productQuery(id));
   const { data: reviews = [] } = useQuery(reviewsQuery(id));
+  const { data: gallery = [] } = useQuery(productImagesQuery(id));
   const { data: all = [] } = useQuery(productsQuery());
 
   if (isLoading) {
@@ -67,15 +69,13 @@ function ProductPage() {
 
       <main className="mx-auto w-full max-w-3xl flex-1 pb-24">
         <div className="bg-card">
-          <img
-            src={product.image}
+          <ImageCarousel
+            images={gallery.length ? gallery.map((g) => g.imageUrl) : [product.image]}
             alt={product.title}
-            width={800}
-            height={800}
-            className="aspect-square w-full object-cover"
           />
           <p className="px-4 pt-2 text-xs text-muted-foreground">Arman Groceries</p>
         </div>
+
 
         <section className="mt-2 bg-card px-4 py-4">
           <h1 className="font-display text-lg font-bold leading-snug">{product.title}</h1>

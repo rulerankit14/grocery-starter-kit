@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Trash2, Upload } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { productQuery, reviewsQuery, uploadStoreImage } from "@/lib/products";
+import { productImagesQuery, productQuery, reviewsQuery, uploadStoreImage } from "@/lib/products";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/products/$id")({
@@ -26,6 +26,7 @@ function EditProduct() {
   const queryClient = useQueryClient();
   const { data: product } = useQuery(productQuery(id));
   const { data: reviews = [] } = useQuery(reviewsQuery(id));
+  const { data: gallery = [] } = useQuery(productImagesQuery(id));
 
   const [form, setForm] = useState({
     title: "",
@@ -114,6 +115,29 @@ function EditProduct() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reviews", id] }),
   });
 
+  const addGallery = useMutation({
+    mutationFn: async (files: FileList) => {
+      let order = gallery.length;
+      for (const file of Array.from(files)) {
+        const url = await uploadStoreImage(file, "products");
+        const { error } = await supabase
+          .from("product_images")
+          .insert({ product_id: id, image_url: url, sort_order: ++order });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["product-images", id] }),
+  });
+
+  const removeGallery = useMutation({
+    mutationFn: async (imageId: string) => {
+      const { error } = await supabase.from("product_images").delete().eq("id", imageId);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["product-images", id] }),
+  });
+
+
   return (
     <AdminShell title="Edit Product">
       {!product ? (
@@ -136,6 +160,44 @@ function EditProduct() {
               />
             </label>
           </div>
+
+          <div className="space-y-3 rounded-xl border border-border bg-card p-4">
+            <h2 className="font-display text-base font-bold">Gallery images</h2>
+            <p className="text-xs text-muted-foreground">
+              Shown as a swipeable, auto-playing slider on the product page.
+            </p>
+            <label className="flex w-fit cursor-pointer items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
+              <Upload className="size-4" />
+              {addGallery.isPending ? "Uploading…" : "Add images"}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (files && files.length) addGallery.mutate(files);
+                }}
+              />
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {gallery.map((g) => (
+                <div key={g.id} className="relative overflow-hidden rounded-lg border border-border">
+                  <img src={g.imageUrl} alt="" className="aspect-square w-full object-cover" />
+                  <button
+                    type="button"
+                    aria-label="Delete image"
+                    onClick={() => removeGallery.mutate(g.id)}
+                    className="absolute right-1 top-1 rounded bg-destructive p-1 text-destructive-foreground"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+
 
           <div className="space-y-3 rounded-xl border border-border bg-card p-4">
             <Field label="Title">
