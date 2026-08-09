@@ -1,37 +1,58 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ShieldCheck, Banknote, Smartphone, CreditCard } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { StoreHeader } from "@/components/store/StoreHeader";
 import { CheckoutSteps } from "@/components/store/CheckoutSteps";
 import { useCart } from "@/lib/cart";
 import { useQuery } from "@tanstack/react-query";
 import { settingsQuery } from "@/lib/products";
+import gpayAsset from "@/assets/gpay.jpg.asset.json";
+import phonepeAsset from "@/assets/phonepe.webp.asset.json";
 
 export const Route = createFileRoute("/payment")({
   head: () => ({
     meta: [
-      { title: "Select Payment Method — Arman Groceries" },
-      { name: "description", content: "Choose UPI, card or cash on delivery to place your grocery order." },
-      { property: "og:title", content: "Select Payment Method — Arman Groceries" },
-      { property: "og:description", content: "Choose how you'd like to pay for your grocery order." },
+      { title: "UPI Payment — Arman Groceries" },
+      { name: "description", content: "Pay securely with any UPI app such as Google Pay or PhonePe." },
+      { property: "og:title", content: "UPI Payment — Arman Groceries" },
+      { property: "og:description", content: "Pay securely with any UPI app such as Google Pay or PhonePe." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: PaymentPage,
 });
 
-type Method = "upi" | "card" | "cod";
+type UpiApp = "gpay" | "phonepe";
 
-const methods: { id: Method; label: string; hint: string; icon: typeof Smartphone }[] = [
-  { id: "upi", label: "UPI (GPay / PhonePe / Paytm)", hint: "Pay instantly from any UPI app", icon: Smartphone },
-  { id: "card", label: "Credit / Debit Card", hint: "Visa, Mastercard, RuPay", icon: CreditCard },
-  { id: "cod", label: "Cash on Delivery", hint: "Pay when your order arrives", icon: Banknote },
+const apps: { id: UpiApp; label: string; note?: string; logo: string; scheme: string }[] = [
+  { id: "gpay", label: "G Pay", logo: gpayAsset.url, scheme: "tez://upi/pay" },
+  { id: "phonepe", label: "PhonePe", note: "20% OFF", logo: phonepeAsset.url, scheme: "phonepe://pay" },
 ];
 
 function PaymentPage() {
   const cart = useCart();
   const navigate = useNavigate();
-  const [method, setMethod] = useState<Method>("upi");
+  const [app, setApp] = useState<UpiApp>("gpay");
   const { data: settings } = useQuery(settingsQuery());
+
+  function payNow() {
+    const pa = settings?.upiId ?? "";
+    const pn = settings?.upiName ?? "Arman Groceries";
+    const tn = `Order at Arman Groceries`;
+    if (pa) {
+      const params = new URLSearchParams({
+        pa,
+        pn,
+        am: String(cart.total),
+        cu: "INR",
+        tn,
+      }).toString();
+      // Generic upi:// intent lets Android show the "choose UPI app — Just once / Always" picker.
+      window.location.href = `upi://pay?${params}`;
+    }
+    setTimeout(() => navigate({ to: "/summary", search: { method: "upi" } }), 1200);
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -51,27 +72,42 @@ function PaymentPage() {
           <h2 className="px-4 pt-4 text-xs font-bold uppercase tracking-wide text-muted-foreground">
             Pay Online
           </h2>
-          <ul className="mt-2 divide-y divide-border">
-            {methods.map((m) => (
-              <li key={m.id}>
+
+          <div className="mt-3 flex items-center gap-3 border-t border-border px-4 py-4">
+            <span className="rounded bg-success px-2 py-1 text-xs font-extrabold text-primary-foreground">
+              UPI
+            </span>
+            <span className="text-sm font-bold">UPI (GPay/PhonePe/Paytm)</span>
+          </div>
+
+          <ul className="divide-y divide-border border-t border-border">
+            {apps.map((a) => (
+              <li key={a.id}>
                 <button
                   type="button"
-                  onClick={() => setMethod(m.id)}
-                  aria-pressed={method === m.id}
+                  onClick={() => setApp(a.id)}
+                  aria-pressed={app === a.id}
                   className="flex w-full items-center gap-3 px-4 py-4 text-left"
                 >
                   <span
                     className={`grid size-5 shrink-0 place-items-center rounded-full border-2 ${
-                      method === m.id ? "border-primary" : "border-border"
+                      app === a.id ? "border-primary" : "border-border"
                     }`}
                   >
-                    {method === m.id && <span className="size-2.5 rounded-full bg-primary" />}
+                    {app === a.id && <span className="size-2.5 rounded-full bg-primary" />}
                   </span>
-                  <m.icon className="size-5 text-primary" />
-                  <span className="flex-1">
-                    <span className="block text-sm font-semibold">{m.label}</span>
-                    <span className="block text-xs text-muted-foreground">{m.hint}</span>
+                  <span className="flex-1 text-sm font-semibold">
+                    {a.label}
+                    {a.note && <span className="ml-2 font-bold text-success">{a.note}</span>}
                   </span>
+                  <img
+                    src={a.logo}
+                    alt={`${a.label} logo`}
+                    width={80}
+                    height={80}
+                    loading="lazy"
+                    className="size-8 rounded object-contain"
+                  />
                 </button>
               </li>
             ))}
@@ -96,8 +132,9 @@ function PaymentPage() {
         </section>
 
         <p className="px-4 py-4 text-center text-[11px] text-muted-foreground">
-          {method === "upi" && settings?.upiId ? `Pay to UPI ID ${settings.upiId} (${settings.upiName}). ` : ""}
-          Online payment is not connected yet. Placing an order here creates a demo order summary.
+          {settings?.upiId
+            ? `You'll be asked to choose your UPI app (Just once / Always) and pay ₹${cart.total} to ${settings.upiId}.`
+            : "UPI ID is not configured yet."}
         </p>
       </main>
 
@@ -108,10 +145,10 @@ function PaymentPage() {
         </div>
         <button
           type="button"
-          onClick={() => navigate({ to: "/summary", search: { method } })}
+          onClick={payNow}
           className="rounded-md bg-primary px-8 py-3 text-sm font-bold text-primary-foreground"
         >
-          {method === "cod" ? "Place Order" : "Pay Now"}
+          PayNow
         </button>
       </div>
     </div>
