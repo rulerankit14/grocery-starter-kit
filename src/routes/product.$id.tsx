@@ -34,6 +34,7 @@ function ProductPage() {
   const navigate = useNavigate();
   const { data: product, isLoading } = useQuery(productQuery(id));
   const { data: reviews = [] } = useQuery(reviewsQuery(id));
+  const { data: gallery = [] } = useQuery(productImagesQuery(id));
   const { data: all = [] } = useQuery(productsQuery());
 
   if (isLoading) {
