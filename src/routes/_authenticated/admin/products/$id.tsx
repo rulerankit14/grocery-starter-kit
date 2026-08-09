@@ -26,6 +26,7 @@ function EditProduct() {
   const queryClient = useQueryClient();
   const { data: product } = useQuery(productQuery(id));
   const { data: reviews = [] } = useQuery(reviewsQuery(id));
+  const { data: gallery = [] } = useQuery(productImagesQuery(id));
 
   const [form, setForm] = useState({
     title: "",
