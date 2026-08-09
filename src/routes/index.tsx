@@ -10,13 +10,13 @@ import { productsQuery, bannersQuery } from "@/lib/products";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Arman Groceries — Daily Essentials at Lowest Prices" },
+      { title: "Meesho — Shopping ki power lo apne haath mein" },
       {
         name: "description",
         content:
           "Shop atta, rice, oil, dry fruits, masalas and household essentials at Arman Groceries. Cash on delivery, 7 days easy return and free delivery on combo packs.",
       },
-      { property: "og:title", content: "Arman Groceries — Daily Essentials at Lowest Prices" },
+      { property: "og:title", content: "Meesho — Shopping ki power lo apne haath mein" },
       {
         property: "og:description",
         content:
