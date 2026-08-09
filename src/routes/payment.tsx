@@ -36,22 +36,27 @@ function PaymentPage() {
   const { data: settings } = useQuery(settingsQuery());
 
   function payNow() {
-    const pa = settings?.upiId ?? "";
-    const pn = settings?.upiName ?? "Arman Groceries";
-    const tn = `Order at Arman Groceries`;
-    if (pa) {
-      const params = new URLSearchParams({
-        pa,
-        pn,
-        am: String(cart.total),
-        cu: "INR",
-        tn,
-      }).toString();
-      // Generic upi:// intent lets Android show the "choose UPI app — Just once / Always" picker.
-      window.location.href = `upi://pay?${params}`;
-    }
+    const pa = (settings?.upiId ?? "").trim();
+    const pn = (settings?.upiName ?? "Arman Groceries").trim();
+    if (!pa) return;
 
+    // Unique transaction reference — UPI apps reject/limit payments without one.
+    const ref = `ARM${Date.now().toString().slice(-9)}`;
+    const enc = (v: string) => encodeURIComponent(v).replace(/%20/g, "%20");
+    const query = [
+      `pa=${enc(pa)}`,
+      `pn=${enc(pn)}`,
+      `tr=${enc(ref)}`,
+      `tn=${enc(`Arman Order ${ref}`)}`,
+      // Amount must be a plain 2-decimal number, otherwise apps treat it as open/invalid.
+      `am=${cart.total.toFixed(2)}`,
+      `cu=INR`,
+    ].join("&");
+
+    // Generic upi:// intent lets Android show the "choose UPI app — Just once / Always" picker.
+    window.location.href = `upi://pay?${query}`;
   }
+
 
   return (
     <div className="flex min-h-screen flex-col">
