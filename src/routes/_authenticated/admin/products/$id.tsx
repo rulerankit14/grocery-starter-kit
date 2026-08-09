@@ -114,6 +114,29 @@ function EditProduct() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reviews", id] }),
   });
 
+  const addGallery = useMutation({
+    mutationFn: async (files: FileList) => {
+      let order = gallery.length;
+      for (const file of Array.from(files)) {
+        const url = await uploadStoreImage(file, "products");
+        const { error } = await supabase
+          .from("product_images")
+          .insert({ product_id: id, image_url: url, sort_order: ++order });
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["product-images", id] }),
+  });
+
+  const removeGallery = useMutation({
+    mutationFn: async (imageId: string) => {
+      const { error } = await supabase.from("product_images").delete().eq("id", imageId);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["product-images", id] }),
+  });
+
+
   return (
     <AdminShell title="Edit Product">
       {!product ? (
