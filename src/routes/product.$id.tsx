@@ -2,8 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { Star, Truck, RotateCcw, BadgeIndianRupee, Zap, ShoppingCart } from "lucide-react";
 import { StoreHeader } from "@/components/store/StoreHeader";
-import { discountPercent, productQuery, productsQuery, reviewsQuery } from "@/lib/products";
+import { discountPercent, productImagesQuery, productQuery, productsQuery, reviewsQuery } from "@/lib/products";
 import { ProductCard } from "@/components/store/ProductCard";
+import { ImageCarousel } from "@/components/store/ImageCarousel";
 import { useCart } from "@/lib/cart";
 
 export const Route = createFileRoute("/product/$id")({
