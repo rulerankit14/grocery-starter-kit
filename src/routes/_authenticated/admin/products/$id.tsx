@@ -162,6 +162,44 @@ function EditProduct() {
           </div>
 
           <div className="space-y-3 rounded-xl border border-border bg-card p-4">
+            <h2 className="font-display text-base font-bold">Gallery images</h2>
+            <p className="text-xs text-muted-foreground">
+              Shown as a swipeable, auto-playing slider on the product page.
+            </p>
+            <label className="flex w-fit cursor-pointer items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-xs font-bold text-primary-foreground">
+              <Upload className="size-4" />
+              {addGallery.isPending ? "Uploading…" : "Add images"}
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (files && files.length) addGallery.mutate(files);
+                }}
+              />
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {gallery.map((g) => (
+                <div key={g.id} className="relative overflow-hidden rounded-lg border border-border">
+                  <img src={g.imageUrl} alt="" className="aspect-square w-full object-cover" />
+                  <button
+                    type="button"
+                    aria-label="Delete image"
+                    onClick={() => removeGallery.mutate(g.id)}
+                    className="absolute right-1 top-1 rounded bg-destructive p-1 text-destructive-foreground"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+
+
+          <div className="space-y-3 rounded-xl border border-border bg-card p-4">
             <Field label="Title">
               <input
                 value={form.title}
