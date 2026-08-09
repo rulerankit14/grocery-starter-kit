@@ -1,6 +1,6 @@
-const steps = ["Cart", "Address", "Payment", "Summary"] as const;
+const steps = ["Cart", "Address", "Payment"] as const;
 
-export function CheckoutSteps({ current }: { current: 1 | 2 | 3 | 4 }) {
+export function CheckoutSteps({ current }: { current: 1 | 2 | 3 }) {
   return (
     <ol className="flex items-center bg-card px-4 py-4">
       {steps.map((label, i) => {
