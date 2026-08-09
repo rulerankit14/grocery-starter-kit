@@ -51,7 +51,7 @@ function PaymentPage() {
       // Generic upi:// intent lets Android show the "choose UPI app — Just once / Always" picker.
       window.location.href = `upi://pay?${params}`;
     }
-    setTimeout(() => navigate({ to: "/summary", search: { method: "upi" } }), 1200);
+
   }
 
   return (
