@@ -133,6 +133,25 @@ export async function fetchReviews(productId: string): Promise<ReviewImage[]> {
   }));
 }
 
+export async function fetchProductImages(productId: string): Promise<ReviewImage[]> {
+  const { data, error } = await supabase
+    .from("product_images")
+    .select("id, image_url")
+    .eq("product_id", productId)
+    .order("sort_order", { ascending: true });
+  if (error) throw error;
+  return (data ?? []).map((r) => ({
+    id: r.id as string,
+    imageUrl: r.image_url as string,
+    caption: null,
+  }));
+}
+
+export const productImagesQuery = (id: string) =>
+  queryOptions({ queryKey: ["product-images", id], queryFn: () => fetchProductImages(id) });
+
+
+
 export async function fetchBanners(includeInactive = false): Promise<Banner[]> {
   let query = supabase.from("banners").select("*").order("sort_order", { ascending: true });
   if (!includeInactive) query = query.eq("active", true);
