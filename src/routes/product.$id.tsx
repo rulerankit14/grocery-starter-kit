@@ -67,15 +67,13 @@ function ProductPage() {
 
       <main className="mx-auto w-full max-w-3xl flex-1 pb-24">
         <div className="bg-card">
-          <img
-            src={product.image}
+          <ImageCarousel
+            images={gallery.length ? gallery.map((g) => g.imageUrl) : [product.image]}
             alt={product.title}
-            width={800}
-            height={800}
-            className="aspect-square w-full object-cover"
           />
           <p className="px-4 pt-2 text-xs text-muted-foreground">Arman Groceries</p>
         </div>
+
 
         <section className="mt-2 bg-card px-4 py-4">
           <h1 className="font-display text-lg font-bold leading-snug">{product.title}</h1>
