@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { StoreHeader } from "@/components/store/StoreHeader";
@@ -32,7 +32,6 @@ const apps: { id: UpiApp; label: string; note?: string; logo: string; scheme: st
 
 function PaymentPage() {
   const cart = useCart();
-  const navigate = useNavigate();
   const [app, setApp] = useState<UpiApp>("gpay");
   const { data: settings } = useQuery(settingsQuery());
 
@@ -51,7 +50,7 @@ function PaymentPage() {
       // Generic upi:// intent lets Android show the "choose UPI app — Just once / Always" picker.
       window.location.href = `upi://pay?${params}`;
     }
-    setTimeout(() => navigate({ to: "/summary", search: { method: "upi" } }), 1200);
+
   }
 
   return (
