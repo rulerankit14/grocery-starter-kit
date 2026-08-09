@@ -94,8 +94,8 @@ function SummaryPage() {
                 Order ID <span className="font-bold text-foreground">{orderId}</span>
               </p>
               <p className="text-xs text-muted-foreground">
-                Paid via {methodLabel[method ?? "cod"]}
-              </p>
+                Paid via {methodLabel[method ?? "upi"]}
+
             </section>
 
             <section className="mt-2 bg-card px-4 py-4">
