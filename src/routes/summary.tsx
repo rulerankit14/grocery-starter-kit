@@ -95,6 +95,8 @@ function SummaryPage() {
               </p>
               <p className="text-xs text-muted-foreground">
                 Paid via {methodLabel[method ?? "upi"]}
+              </p>
+
 
             </section>
 
