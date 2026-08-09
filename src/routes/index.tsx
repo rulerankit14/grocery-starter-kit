@@ -14,13 +14,13 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Shop atta, rice, oil, dry fruits, masalas and household essentials at Arman Groceries. Cash on delivery, 7 days easy return and free delivery on combo packs.",
+          "Shop atta, rice, oil, dry fruits, masalas and household essentials at Meesho. Cash on delivery, 7 days easy return and free delivery on combo packs.",
       },
       { property: "og:title", content: "Meesho — Shopping ki power lo apne haath mein" },
       {
         property: "og:description",
         content:
-          "Shop atta, rice, oil, dry fruits, masalas and household essentials at Arman Groceries. Cash on delivery, 7 days easy return and free delivery on combo packs.",
+          "Shop atta, rice, oil, dry fruits, masalas and household essentials at Meesho. Cash on delivery, 7 days easy return and free delivery on combo packs.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -104,7 +104,7 @@ function Index() {
 
         <section className="flex items-center gap-3 bg-card px-4 py-3">
           <h2 className="flex items-center gap-1.5 font-display text-base font-extrabold">
-            Arman Daily Deals
+            Meesho Daily Deals
             <Zap className="size-4 fill-deal text-deal" />
           </h2>
           <span className="ml-auto rounded-md bg-accent px-3 py-1.5 font-display text-sm font-bold tabular-nums text-primary">
@@ -130,12 +130,12 @@ function Index() {
         </section>
 
         <footer className="bg-card px-4 py-8 text-center">
-          <p className="font-display text-xl font-extrabold lowercase text-primary">arman groceries</p>
+          <p className="font-display text-xl font-extrabold lowercase text-primary">meesho</p>
           <p className="mt-1 text-xs text-muted-foreground">
             India&apos;s trusted store for daily essentials
           </p>
           <p className="mt-4 text-[11px] text-muted-foreground">
-            © {new Date().getFullYear()} Arman Groceries. All rights reserved.
+            © {new Date().getFullYear()} Meesho. All rights reserved.
           </p>
         </footer>
       </main>
