@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Trash2, Upload } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
-import { productQuery, reviewsQuery, uploadStoreImage } from "@/lib/products";
+import { productImagesQuery, productQuery, reviewsQuery, uploadStoreImage } from "@/lib/products";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin/products/$id")({
