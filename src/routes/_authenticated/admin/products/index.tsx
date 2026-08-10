@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Link2, ClipboardPaste } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { productsQuery, uploadStoreImage } from "@/lib/products";
+import { importProductFromText, importProductFromUrl, mirrorImage } from "@/lib/import.functions";
 import { supabase } from "@/integrations/supabase/client";
+
 
 export const Route = createFileRoute("/_authenticated/admin/products/")({
   head: () => ({
@@ -36,33 +38,107 @@ function AdminProducts() {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("199");
   const [mrp, setMrp] = useState("999");
+  const [description, setDescription] = useState("");
+  const [highlights, setHighlights] = useState("");
+  const [remoteImages, setRemoteImages] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState("");
+
+  const [importUrl, setImportUrl] = useState("");
+  const [importText, setImportText] = useState("");
+  const [importMode, setImportMode] = useState<"link" | "text">("link");
+  const [importError, setImportError] = useState("");
+  const [importNote, setImportNote] = useState("");
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["products"] });
   };
 
+  const applyDraft = (draft: {
+    title: string;
+    price: number;
+    mrp: number;
+    description: string;
+    highlights: string[];
+    images: string[];
+  }) => {
+    setOpen(true);
+    setError("");
+    setImportError("");
+    if (draft.title) setTitle(draft.title);
+    if (draft.price) setPrice(String(draft.price));
+    if (draft.mrp) setMrp(String(draft.mrp));
+    if (draft.description) setDescription(draft.description);
+    if (draft.highlights.length) setHighlights(draft.highlights.join("\n"));
+    setRemoteImages(draft.images);
+    setImportNote(
+      draft.images.length
+        ? `Imported ${draft.images.length} photo${draft.images.length > 1 ? "s" : ""} — everything below is editable.`
+        : "Imported the details. Add a product photo below.",
+    );
+  };
+
+  const runImport = useMutation({
+    mutationFn: async () =>
+      importMode === "link"
+        ? importProductFromUrl({ data: { url: importUrl } })
+        : importProductFromText({ data: { text: importText } }),
+    onSuccess: applyDraft,
+    onError: (e: Error) => {
+      setImportNote("");
+      setImportError(e.message);
+    },
+  });
+
   const create = useMutation({
     mutationFn: async () => {
       if (!title.trim()) throw new Error("Enter a product title");
-      if (!file) throw new Error("Choose a product image");
-      const imageUrl = await uploadStoreImage(file, "products");
+      if (!file && remoteImages.length === 0) throw new Error("Choose a product image");
+
+      const gallery: string[] = [];
+      for (const url of remoteImages) {
+        try {
+          const saved = await mirrorImage({ data: { url, folder: "products" } });
+          gallery.push(saved.url);
+        } catch {
+          /* skip images that cannot be copied */
+        }
+      }
+      if (file) gallery.unshift(await uploadStoreImage(file, "products"));
+      if (gallery.length === 0) throw new Error("None of the product photos could be saved — upload one manually");
+
       const id = `${slugify(title)}-${Math.random().toString(36).slice(2, 6)}`;
       const { error: insertError } = await supabase.from("products").insert({
         id,
         title: title.trim(),
-        image_url: imageUrl,
+        image_url: gallery[0]!,
         price: Number(price) || 0,
         mrp: Number(mrp) || 0,
+        description: description.trim(),
+        highlights: highlights
+          .split("\n")
+          .map((h) => h.trim())
+          .filter(Boolean),
         sort_order: products.length + 1,
       });
       if (insertError) throw insertError;
+
+      if (gallery.length > 1) {
+        await supabase.from("product_images").insert(
+          gallery.map((url, i) => ({ product_id: id, image_url: url, sort_order: i })),
+        );
+      }
     },
     onSuccess: () => {
       setOpen(false);
       setTitle("");
       setFile(null);
+      setDescription("");
+      setHighlights("");
+      setRemoteImages([]);
+      setImportUrl("");
+      setImportText("");
+      setImportNote("");
       setError("");
       invalidate();
     },
@@ -87,6 +163,63 @@ function AdminProducts() {
 
   return (
     <AdminShell title="Products">
+      <section className="mb-4 space-y-3 rounded-xl border border-border bg-card p-4">
+        <h2 className="text-sm font-bold">Auto-fetch a product</h2>
+        <div className="flex gap-2">
+          {(["link", "text"] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => {
+                setImportMode(mode);
+                setImportError("");
+              }}
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold ${
+                importMode === mode
+                  ? "bg-primary text-primary-foreground"
+                  : "border border-border text-muted-foreground"
+              }`}
+            >
+              {mode === "link" ? <Link2 className="size-3.5" /> : <ClipboardPaste className="size-3.5" />}
+              {mode === "link" ? "From link" : "Paste details"}
+            </button>
+          ))}
+        </div>
+
+        {importMode === "link" ? (
+          <input
+            value={importUrl}
+            onChange={(e) => setImportUrl(e.target.value)}
+            placeholder="https://www.meesho.com/…/p/xxxxx"
+            className="input"
+            inputMode="url"
+          />
+        ) : (
+          <textarea
+            value={importText}
+            onChange={(e) => setImportText(e.target.value)}
+            rows={5}
+            placeholder="Open the product page, copy the title, price, MRP and description, and paste everything here."
+            className="input"
+          />
+        )}
+
+        <button
+          type="button"
+          disabled={runImport.isPending}
+          onClick={() => runImport.mutate()}
+          className="rounded-md bg-accent px-4 py-2 text-sm font-bold text-accent-foreground disabled:opacity-60"
+        >
+          {runImport.isPending ? "Fetching…" : "Fetch product"}
+        </button>
+
+        {importError && <p className="text-xs font-semibold text-destructive">{importError}</p>}
+        {importNote && <p className="text-xs font-semibold text-success">{importNote}</p>}
+        <p className="text-[11px] text-muted-foreground">
+          Some shops (Meesho included) block automatic readers. If the link fails, switch to “Paste details”.
+        </p>
+      </section>
+
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
@@ -113,6 +246,42 @@ function AdminProducts() {
               <input value={mrp} onChange={(e) => setMrp(e.target.value)} className="input" inputMode="numeric" />
             </Field>
           </div>
+          <Field label="Description">
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
+              className="input"
+            />
+          </Field>
+          <Field label="Key features (one per line)">
+            <textarea
+              value={highlights}
+              onChange={(e) => setHighlights(e.target.value)}
+              rows={3}
+              className="input"
+            />
+          </Field>
+          {remoteImages.length > 0 && (
+            <div>
+              <span className="text-xs font-semibold text-muted-foreground">Imported photos</span>
+              <div className="mt-1 flex gap-2 overflow-x-auto">
+                {remoteImages.map((src) => (
+                  <div key={src} className="relative shrink-0">
+                    <img src={src} alt="" className="size-16 rounded object-cover" />
+                    <button
+                      type="button"
+                      aria-label="Remove imported photo"
+                      onClick={() => setRemoteImages((list) => list.filter((u) => u !== src))}
+                      className="absolute -right-1 -top-1 rounded-full bg-destructive p-0.5 text-destructive-foreground"
+                    >
+                      <Trash2 className="size-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <Field label="Image">
             <input
               type="file"
@@ -134,6 +303,7 @@ function AdminProducts() {
       )}
 
       {isLoading ? (
+
         <div className="h-40 animate-pulse rounded-lg bg-muted" />
       ) : (
         <ul className="space-y-2">
