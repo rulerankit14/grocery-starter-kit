@@ -170,3 +170,32 @@ export const importProductFromText = createServerFn({ method: "POST" })
     if (!args) throw new Error("Could not read those details");
     return normalise(JSON.parse(args) as Record<string, unknown>, "text");
   });
+
+/** Copies a remote product photo into the store's own image library. */
+export const mirrorImage = createServerFn({ method: "POST" })
+  .inputValidator((input: { url: string; folder: string }) => {
+    if (!/^https?:\/\/\S+$/i.test(input.url)) throw new Error("Invalid image link");
+    return { url: input.url.slice(0, 700), folder: input.folder.replace(/[^a-z0-9-]/gi, "").slice(0, 32) || "products" };
+  })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ data, context }): Promise<{ url: string }> => {
+    await assertStaff(context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const res = await fetch(data.url, { headers: { "User-Agent": "Mozilla/5.0" } });
+    if (!res.ok) throw new Error(`Could not download that image (${res.status})`);
+    const type = res.headers.get("content-type") ?? "image/jpeg";
+    if (!type.startsWith("image/")) throw new Error("That link is not an image");
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    if (bytes.byteLength > 8_000_000) throw new Error("That image is too large");
+
+    const ext = type.split("/")[1]?.split(";")[0] ?? "jpg";
+    const path = `${data.folder}/${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabaseAdmin.storage.from("store").upload(path, bytes, {
+      contentType: type,
+      cacheControl: "31536000",
+      upsert: false,
+    });
+    if (error) throw new Error(error.message);
+    return { url: `/api/public/img/${path}` };
+  });
