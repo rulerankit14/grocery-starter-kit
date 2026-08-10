@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Link2, ClipboardPaste } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { productsQuery, uploadStoreImage } from "@/lib/products";
+import { importProductFromText, importProductFromUrl, mirrorImage } from "@/lib/import.functions";
 import { supabase } from "@/integrations/supabase/client";
+
 
 export const Route = createFileRoute("/_authenticated/admin/products/")({
   head: () => ({
